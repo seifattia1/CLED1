@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "skipDefaultLibCheck": true,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": false,
+    "outFile": "../wwwroot/js/drawingEditor.js",
+    "target": "es2015",
+    "allowJs": true,
+    "lib": ["es2015", "dom", "dom.Iterable"]
+  },
+  "compileOnSave": true,
+  "include": [
+    "*",
+    "Enums/CursorMode.ts",
+    "Enums/DrawingMode.ts",
+    "Enums/ImageDropdownStyle.ts",
+    "Drawers/IObjectDrawer.ts",
+    "Drawers/LineDrawer.ts",
+    "Drawers/RectangleDrawer.ts",
+    "Drawers/OvalDrawer.ts",
+    "Drawers/PolylineDrawer.ts",
+    "Drawers/TriangleDrawer.ts",
+    "Drawers/TextDrawer.ts",
+    "Components/DisplayComponent.ts",
+    "Components/ControlComponent.ts",
+    "Components/ImageDropdown.ts",
+    "Components/ImageDropdownOptions.ts",
+    "Components/ImageOption.ts",
+    "Components/Tools/ColorChooserComponent.ts",
+    "Components/Tools/DeleteComponent.ts",
+    "Components/Tools/LineDisplayComponent.ts",
+    "Components/Tools/LineThicknessComponent.ts",
+    "Components/Tools/LineTypeComponent.ts",
+    "Components/Tools/RectangleDisplayComponent.ts",
+    "Components/Tools/OvalDisplayComponent.ts",
+    "Components/Tools/PolylineDisplayComponent.ts",
+    "Components/Tools/RedoComponent.ts",
+    "Components/Tools/TriangleDisplayComponent.ts",
+    "Components/Tools/TextDisplayComponent.ts",
+    "Components/Tools/UndoComponent.ts",
+    "typings/fabric/index.d.ts",
+    "typings/jquery/jquery.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "paths": {
+    "*": [ "*" ]
+  }
+}

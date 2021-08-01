@@ -1,0 +1,207 @@
+﻿@page
+@model CLED1.Pages.problemOutputModel
+@{
+}
+
+
+<h1>Make a Drawing!</h1>
+<div class="col-md">
+
+    <label>
+        @{
+
+            string @urlpath = "";
+
+            if (Model.List7 != null)
+            {
+                foreach (var @a in Model.List7)
+                {
+                    string[] ad = a.ToArray();
+
+
+
+                    foreach (var item in a)
+                    {
+
+                        if (((item.Contains("http://")) || item.Contains("https://")))
+                        {
+                            int i = Int32.Parse(ad[3]);
+                            urlpath = @item.ToString();
+                            if ((ad[1] != "PROPN"))
+                            {
+
+                                <span>  <img id="sss" src="@urlpath.ToString()" class="img-responsive" style="height: 100px; width: 100px;" /></span>
+                                <span> @i</span>
+
+                            }
+
+                        }
+                    }
+                    if ((ad[1] == "PROPN"))
+                    {
+                        urlpath = ad[0].ToString();
+
+                        <span> <img src="@urlpath.ToString()" class="img-responsive" style="height: 100px; width: 100px;" /> ==> </span>
+                    }
+
+
+
+                }
+
+
+            }
+        }
+    </label>
+</div>
+
+
+<div class="row drawingToolbar bg-secondary text-light">
+    <div class="btn-toolbar">
+        <div class="btn-group mr-2" role="group">
+            <div id="undoComponent"></div>
+            <div id="redoComponent"></div>
+            <button onclick="saveDrawing(event); return false;" title="Save" class="btn btn-success">
+                <i class="fa fa-save d-inline"></i>
+                <span>Save</span>
+            </button>
+            <div id="deleteComponent"></div>
+        </div>
+    </div>
+    <div class="btn-toolbar">
+        <label class="col-form-label controlLabel">Tools:</label>
+        <div class="d-inline-block">
+            <div class="btn-group btn-group-toggle" role="group" data-toggle="buttons" aria-label="Drawing Components">
+                <div id="polylineDisplayComponent"></div>
+                <div id="lineDisplayComponent"></div>
+                <div id="rectangleDisplayComponent"></div>
+                <div id="ovalDisplayComponent"></div>
+                <div id="triangleDisplayComponent"></div>
+                <div id="textDisplayComponent"></div>
+            </div>
+        </div>
+    </div>
+    <div class="separator"></div>
+    <div class="btn-toolbar">
+        <label class="col-form-label controlLabel d-inline">Size:</label>
+        <div id="lineThicknessComponent"></div>
+
+        <div class="separator"></div>
+
+        <label class="col-form-label controlLabel d-inline">Style:</label>
+        <div id="lineTypeComponent"></div>
+
+        <div class="separator"></div>
+
+        <label class="col-form-label controlLabel d-inline">Lines:</label>
+        <div id="lineColorComponent"></div>
+
+        <div class="separator"></div>
+
+        <label class="col-form-label controlLabel ">Fill:</label>
+        <div id="fillColorComponent"></div>
+    </div>
+</div>
+
+
+<div class="row editorContainer">
+    <div class="CanvasContainer">
+        <div id="canvas"></div>
+    </div>
+</div>
+<div class="row notificationBar noPrint">
+    <div class="col">
+        <div id="StatusBar" class="float-right"></div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script src="~/js/drawingEditor.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js">
+    </script>
+    <script>
+        var editor;
+        var savingLocked = true;
+        const savingMessage = '<div id="Saving"><i class="fa fa-spin fa-cog "></i>Saving...</div>';
+        $(function () {
+            //Calculate canvas height as a function of the window size.
+            var canvasHeight = (window.innerHeight - $('#canvas').offset().top) * .9;
+            var canvasWidth = $('#canvas').width();
+
+            //Instantiate our new editor
+            //The canvas is created inside this constructor, using the selector passed.
+            editor = new DrawingEditor('canvas', canvasHeight, canvasWidth);
+
+            //Create a list of available display components
+            const components = [
+                { id: '#lineDisplayComponent', type: 'line' },
+                { id: '#rectangleDisplayComponent', type: 'rect' },
+                { id: '#ovalDisplayComponent', type: 'oval' },
+                { id: '#triangleDisplayComponent', type: 'tria' },
+                { id: '#textDisplayComponent', type: 'text' },
+                { id: '#polylineDisplayComponent', type: 'polyline' },
+                { id: '#deleteComponent', type: 'delete' },
+                { id: 'fillColorComponent', type: 'fillColorChooser' },
+                { id: 'lineColorComponent', type: 'lineColorChooser' },
+                { id: 'lineTypeComponent', type: 'lineType' },
+                { id: 'lineThicknessComponent', type: 'lineThickness' },
+                { id: '#undoComponent', type: 'undo' },
+                { id: '#redoComponent', type: 'redo' }
+            ];
+
+            //Add the components to the DrawingEditor, which will render them.
+            editor.addComponents(components);
+            $('#lineDisplayComponent').click();
+x
+
+   
+
+
+            $("html").on('keydown', function (event) {
+                const key = event.key;
+                if (key == "Delete") {
+                    editor.deleteSelected();
+                }
+            });
+
+            editor.saveFunc = saveDrawing();
+        });
+
+        function saveDrawing() {
+            if (!savingLocked) {
+                showSaving();
+                const drawing = {
+                    DrawingContent: JSON.stringify(editor.getJson()),
+                };
+
+                $.ajax({
+                    type: "POST",
+                    data: drawing,
+                    async: true,
+                    url: '?handler=Save'
+                }).done(function (data) {
+                    hideSaving();
+                }).fail(function () {
+                    hideSaving();
+                    alert('We are unable to save changes at this time.');
+                });
+            }
+        }
+
+        function showSaving() {
+            message = savingMessage;
+            $('#StatusBar').html(message);
+            savingLocked = true;
+            setTimeout(function () { savingLocked = false; }, 1000);
+        }
+
+        function hideSaving() {
+            if (savingLocked)
+                setTimeout(() => hideSaving(), 100);
+            else {
+                $('#Saving').remove();
+                message = '';
+            }
+        }
+    </script>
+}
